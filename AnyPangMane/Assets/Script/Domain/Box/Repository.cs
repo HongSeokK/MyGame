@@ -8,6 +8,6 @@ namespace ManeProject.Domain.Box
 {
     public interface IRepository
     {
-        Box CreateBox();
+        BoxArray CreateBoxArray();
     }
 }
