@@ -1,0 +1,89 @@
+# =============== #
+# Unity generated # 
+# =============== #
+ 
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uilds/
+[R]romFile/
+Assets/AssetStoreTools*
+Logs/
+InitTestScene*.unity*
+
+# ===================================== #
+# Visual Studio / MonoDevelop generated #
+# ===================================== #
+ 
+ExportedObj/
+.consulo/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.opendb
+.vs/
+
+# ======================================== #
+# Unity3D Generated File On Crash Reports  #  
+# ======================================== #
+
+sysinfo.txt
+UserPrefs.xml
+
+# ============ #
+# Builds       #
+# ============ #
+
+*.apk
+*.aab
+*.apks
+*.unitypackage
+
+# ============================ #
+# Unity3D generated meta files #
+# ============================ #
+
+*.pidb.meta
+*.pdb.meta
+*.csproj.meta
+*.sln.meta
+
+# ================== #
+# Unity Test results #
+# ================== #
+EditorTestResults.xml
+
+# ============================ #
+# UnityEngine.AssetGraph       #
+# ============================ #
+Assets/UnityEngine.AssetGraph/Cache
+Assets/UnityEngine.AssetGraph/Cache.meta
+
+# ============================ #
+# Autoya                       #
+# ============================ #
+Assets/Autoya/Manifest/ShouldGitIgnore
+Assets/Autoya/Manifest/ShouldGitIgnore.meta
+
+# ================== #
+# Attack Result Log    #
+# ================== #
+Log/AttackResultLog.txt
+
+# ============================ #
+# SRDebugger                   #
+# ============================ #
+Assets/StompyRobot/SRDebugger/PlaymakerIntegration.unitypackage.meta
+
+# ================== #
+# Unity Recorder     #
+# ================== #
+Recordings/
