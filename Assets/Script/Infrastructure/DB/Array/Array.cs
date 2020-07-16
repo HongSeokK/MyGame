@@ -5,7 +5,7 @@ using System;
 namespace ManeProject.Infrastructure.DB
 {
     [Table("array")]
-    public sealed class Array
+    public sealed class DBArray
     {
         [PrimaryKey, Column("row")]
         public int Row { get; set; } = 0;

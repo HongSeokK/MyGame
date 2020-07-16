@@ -8,6 +8,7 @@ namespace ManeProject.Domain.Box
 {
     public interface IRepository
     {
-        BoxArray CreateBoxArray();
+        IBoxArray CreateBoxArray();
+        Task<List<IBoxArray>>  CreateRandomType(int count);
     }
 }

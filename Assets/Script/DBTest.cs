@@ -1,12 +1,21 @@
 ﻿using UnityEngine;
+using Randomm = System.Random;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using ManeProject.Domain.Box;
 using ManeProject.Infrastructure.DB;
+using ManeProject.Infrastructure.Repository;
 
 
 public class DBTest : MonoBehaviour
 {
+    [SerializeField]
+    private GameObject Red;
+    [SerializeField]
+    private GameObject Blue;
+    [SerializeField]
+    private GameObject Yellow;
     // Use this for initialization
     async void Start()
     {
@@ -14,14 +23,29 @@ public class DBTest : MonoBehaviour
 
         var ttest = DBConnect.SQLConnect.DatabasePath;
 
-        Debug.Log(ttest);
+        var test = BoxRepository.Instance;
 
-        var test = DBConnect.SQLConnect.Table<Array>().AsEnumerable();
+        var Random = new Randomm();
 
-        foreach(var s in test)
+
+        var test2 = await test.CreateRandomType(64);
+
+        foreach (var s in test2)
         {
-            Debug.Log("Row = " + s.Row + ", Column = " + s.Column + ", PositionX = " + s.PositionX + ", PositionY = " + s.PositionY);
+            switch (s.BoxType)
+            {
+                case var _ when BoxType.Red == s.BoxType: 
+                    Instantiate(Red, new Vector3(s.BoxPosition.X,s.BoxPosition.Y,s.BoxPosition.Z),new Quaternion());
+                    break;
+                case var _ when BoxType.Blue == s.BoxType:
+                    Instantiate(Blue, new Vector3(s.BoxPosition.X, s.BoxPosition.Y, s.BoxPosition.Z), new Quaternion());
+                    break;
+                case var _ when BoxType.Yellow == s.BoxType:
+                    Instantiate(Yellow, new Vector3(s.BoxPosition.X, s.BoxPosition.Y, s.BoxPosition.Z), new Quaternion());
+                    break;
+            }
         }
+
     }
 
     // Update is called once per frame
