@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ManeProject.Infrastructure.DB;
 
 namespace ManeProject.Domain.Box
 {
@@ -11,14 +12,18 @@ namespace ManeProject.Domain.Box
         Task<IBoxArray[,]> CreateBoxArray();
     }
 
-    public interface ICache
+    /// <summary>
+    /// キャッシュレポジトリ
+    /// </summary>
+    public interface ICache : IDisposable
     {
+        /// <summary>
+        /// キャッシュに保存済みか
+        /// </summary>
         bool IsStored { get; }
 
-        IBoxArray[,] BlockArray { get; }
+        IBoxArray[,] GetBlockArray();
 
-        Task<IBoxArray[,]> Store();
-
-        Task<IBoxArray[,]> GetBlockArray();
+        IBoxArray[,] InitBoxArray(DBArray[] DBinfo);
     }
 }
