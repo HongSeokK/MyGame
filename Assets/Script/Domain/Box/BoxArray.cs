@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using ManeProject.Infrastructure.DB;
 
 namespace ManeProject.Domain.Box
 {
@@ -16,6 +17,16 @@ namespace ManeProject.Domain.Box
         /// Box のタイプ
         /// </summary>
         BoxType.IType BoxType { get; }
+
+        /// <summary>
+        /// 現在削除できる状況か
+        /// </summary>
+        bool IsDeletable { get; }
+
+        /// <summary>
+        /// グループになるリストの番号
+        /// </summary>
+        int GroupListNum { get; }
     }
 
     /// <summary>
@@ -31,10 +42,12 @@ namespace ManeProject.Domain.Box
         /// <returns></returns>
         public static IBoxArray Create(
                 Position boxPosition,
-                BoxType.IType boxType
+                BoxType.IType boxType,
+                int groupListNum
             ) => new BoxArrayImpl(
                 boxPosition,
-                boxType
+                boxType,
+                groupListNum
             );
 
         private sealed class BoxArrayImpl : IBoxArray
@@ -50,19 +63,34 @@ namespace ManeProject.Domain.Box
             public BoxType.IType BoxType { get; }
 
             /// <summary>
+            /// 現在削除できる状態か
+            /// </summary>
+            public bool IsDeletable { get; }
+
+            /// <summary>
+            /// グループとなるリストの番号
+            /// </summary>
+            public int GroupListNum { get; }
+
+            /// <summary>
             /// コンストラクター
             /// </summary>
             /// <param name="boxPosition"></param>
             /// <param name="boxType"></param>
             public BoxArrayImpl(
                     Position boxPosition,
-                    BoxType.IType boxType
+                    BoxType.IType boxType,
+                    int groupListNum
                 ) => (
                     BoxPosition,
-                    BoxType
+                    BoxType,
+                    GroupListNum,
+                    IsDeletable
                 ) = (
                     boxPosition,
-                    boxType
+                    boxType,
+                    groupListNum,
+                    false
                 );
         }
     }

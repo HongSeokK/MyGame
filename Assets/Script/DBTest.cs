@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 using Randomm = System.Random;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,22 +17,35 @@ public class DBTest : MonoBehaviour
     private GameObject Blue;
     [SerializeField]
     private GameObject Yellow;
+
+    private GameObject mouseDownSelectedObj;
+    private GameObject mouseUpSelectedObj;
+
+
+    private GameObject MainCanvas;
     // Use this for initialization
+
+    private void Awake()
+    {
+        MainCanvas = GameObject.Find("MainCanvas");
+    }
+
     async void Start()
     {
-        await DBConnect.Initialize();
 
+        await DBConnect.Initialize();
         var ttest = DBConnect.SQLConnect.DatabasePath;
 
         var test = BoxRepository.Instance;
 
         var Random = new Randomm();
 
-
-        var test2 = await test.CreateRandomType(64);
+        var test2 =await test.CreateBoxArray(); 
 
         foreach (var s in test2)
         {
+            if (s == null)
+                Debug.Log("null");
             switch (s.BoxType)
             {
                 case var _ when BoxType.Red == s.BoxType: 
@@ -45,12 +59,43 @@ public class DBTest : MonoBehaviour
                     break;
             }
         }
-
     }
 
     // Update is called once per frame
     void Update()
     {
 
+        if (Input.GetMouseButtonDown(0))
+        {
+            RaycastHit hit = new RaycastHit();
+
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            if (Physics.Raycast(ray.origin, ray.direction, out hit))
+            {
+                Debug.Log("12345");
+                mouseDownSelectedObj = hit.transform.gameObject;
+            }
+        }
+        if (Input.GetMouseButtonUp(0))
+        {
+            RaycastHit hit = new RaycastHit();
+
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            
+            if (Physics.Raycast(ray.origin, ray.direction, out hit))
+            {
+                mouseUpSelectedObj = hit.transform.gameObject;
+            }
+
+            if (mouseUpSelectedObj != null && mouseDownSelectedObj != null && mouseDownSelectedObj == mouseUpSelectedObj)
+            {
+                Debug.Log("Ho!");
+            }
+
+            mouseDownSelectedObj = null;
+            mouseUpSelectedObj = null;
+        }
     }
+
 }

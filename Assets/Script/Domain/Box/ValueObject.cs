@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ManeProject.Domain.Box
+﻿namespace ManeProject.Domain.Box
 {
     /// <summary>
     /// 生成位置
@@ -33,5 +27,28 @@ namespace ManeProject.Domain.Box
         /// <param name="y"></param>
         /// <param name="z"></param>
         public Position(int x, int y, int z) => (X, Y, Z) = (x, y, z);
+    }
+
+    /// <summary>
+    /// Box の配列中の位置
+    /// </summary>
+    public readonly struct ArrayPosition
+    {
+        /// <summary>
+        /// 行
+        /// </summary>
+        public int Row { get; }
+
+        /// <summary>
+        /// 列
+        /// </summary>
+        public int Column { get; }
+
+        /// <summary>
+        /// コンストラクター
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="column"></param>
+        public ArrayPosition(int row, int column) => (Row, Column) = (row, column);
     }
 }
