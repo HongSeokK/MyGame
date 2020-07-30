@@ -51,4 +51,21 @@
         /// <param name="column"></param>
         public ArrayPosition(int row, int column) => (Row, Column) = (row, column);
     }
+
+    /// <summary>
+    /// ボックスネーム
+    /// </summary>
+    public readonly struct BoxName
+    {
+        /// <summary>
+        /// ネーム
+        /// </summary>
+        public string Value { get; }
+
+        /// <summary>
+        /// コンストラクター
+        /// </summary>
+        /// <param name="name"></param>
+        public BoxName(string name) => Value = name;
+    }
 }

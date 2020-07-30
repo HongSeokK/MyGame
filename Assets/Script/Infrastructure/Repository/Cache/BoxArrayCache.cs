@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using ManeProject.Domain.Box;
 using DBArray = ManeProject.Infrastructure.DB.DBArray;
+using Random = System.Random;
+using System.Threading.Tasks;
+using UnityEngine;
 
 namespace ManeProject.Infrastructure.Repository.Cache
 {
@@ -10,11 +13,17 @@ namespace ManeProject.Infrastructure.Repository.Cache
     {
         public static ICache Instance => instance.Value;
 
-        private sealed class BlockCacheImpl : ICache
+        private sealed class BlockCacheImpl : MonoBehaviour, ICache
         {
-            private IBoxArray[,] BoxArrays { get; set; }
+            private static IBoxArray[,] BoxArrays { get; set; }
+
+            private static List<DBArray> DBArray { get; set; }
 
             public bool IsStored { get; private set; }
+
+            private int MaxRow { get; set; }
+
+            private int MaxColumn { get; set; }
 
             /// <summary>
             /// 配列を探索するための周縁位置配列
@@ -57,14 +66,13 @@ namespace ManeProject.Infrastructure.Repository.Cache
             /// <param name="column">最大列</param>
             /// <param name="dbArray">DB から取ってくる情報</param>
             /// <returns></returns>
-            private IBoxArray[,] InitTile(int row, int column, DBArray[] dbArray)
+            private IBoxArray[,] InitTile(int row, int column, List<DBArray> dbArray)
             {
-
                 var random = new Random();
 
-                var testArray = new IBoxArray[row, column];
-                var testPositions = new Position[row, column];
-                var testTypes = new BoxType.IType[row, column];
+                var returnArray = new IBoxArray[row, column];
+                var positions = new Position[row, column];
+                var types = new BoxType.IType[row, column];
 
                 var redCount = 0;
                 var blueCount = 0;
@@ -74,6 +82,10 @@ namespace ManeProject.Infrastructure.Repository.Cache
 
                 var limitColorCount = (row * column) / 3 + 1;
 
+                DBArray = dbArray;
+
+                MaxRow = row;
+                MaxColumn = column;
 
                 for (int r = 0; r < row;)
                 {
@@ -96,16 +108,16 @@ namespace ManeProject.Infrastructure.Repository.Cache
                                 yellowCount++;
                                 break;
                         }
-                        var position = new Position(dbArray[createdCount].PositionX, dbArray[createdCount].PositionY, 0);
-                        testPositions[r, c] = new Position(dbArray[createdCount].PositionX, dbArray[createdCount].PositionY, 0);
-                        testTypes[r, c] = type;
+                        var position = new Position(DBArray[createdCount].PositionX, DBArray[createdCount].PositionY, 0);
+                        var boxName = new BoxName(r.ToString() + c.ToString());
+                        returnArray[r, c] = BoxArrayFactory.Create(position, type, 0, false, false, null, boxName);
                         c++;
                         createdCount++;
                     }
                     r++;
                 }
 
-                GroupListArray = MatchBoxes(row, column, testTypes);
+                GroupListArray = MatchBoxes(row, column, BoxArrays);
 
                 for (int i = 0; i < GroupListArray.GetLength(0); i++)
                 {
@@ -113,14 +125,198 @@ namespace ManeProject.Infrastructure.Repository.Cache
                     {
                         foreach (var temp in GroupListArray[i])
                         {
-                            testArray[temp.X, temp.Y] = BoxArrayFactory.Create(testPositions[temp.X, temp.Y], testTypes[temp.X, temp.Y], i);
-                            UnityEngine.Debug.Log(i + "번째 " + testArray[temp.X, temp.Y].BoxType.Value + " 다 ");
+                            var boxName = new BoxName(temp.X.ToString() + temp.Y.ToString());
                         }
                     }
                 }
 
-                return testArray;
+                return returnArray;
             }
+
+            public void DeleteBoxes(int ListNum)
+            {
+                if(IsStored)
+                {
+                    foreach(var box in GroupListArray[ListNum])
+                    {
+                        BoxArrays[box.X, box.Y] = null;
+                    }
+                    GroupListArray[ListNum] = null;
+                }
+            }
+
+            public List<IBoxArray> GetBoxArrayFromList(int row, int column)
+            {
+                var returnList = new List<IBoxArray>();
+
+                var taget = BoxArrays[row, column];
+
+                if (IsStored)
+                {
+                    foreach (var box in GroupListArray[taget.GroupListNum])
+                    {
+                        returnList.Add(BoxArrays[box.X, box.Y]);
+                    }
+                    return returnList;
+                }
+
+                throw new NullReferenceException();
+            }
+
+            public DeleteResult TryDelete(int row, int column)
+            {
+
+                var returnList = new List<IBoxArray>();
+
+                var target = BoxArrays[row, column];
+
+                if (IsStored)
+                {
+                    var targetList = GroupListArray[target.GroupListNum];
+
+                    var targetListCount = targetList.Count();
+
+                    var isDeleteable = targetListCount >= 3;
+                    if (isDeleteable)
+                    {
+                        foreach (var box in targetList)
+                        {
+                            Destroy(BoxArrays[box.X, box.Y].GameObj);
+                            BoxArrays[box.X, box.Y] = BoxArrays[box.X, box.Y].UnSetGameObj();
+                            returnList.Add(BoxArrays[box.X, box.Y]);
+                        }
+
+                        RefreshAfterTileClean();
+                    }
+                    return new DeleteResult { BoxList = BoxArrays, IsDeleteable = isDeleteable };
+                }
+
+                throw new NullReferenceException();
+            }
+
+            private void RefreshAfterTileClean()
+            {
+                List<GroupPosition> emptyArray = new List<GroupPosition>();
+
+                var random = new Random();
+
+                for(int r = 0; r < MaxRow; r++)
+                {
+                    for(int c = 0; c < MaxColumn; c++)
+                    {
+                        //if (BoxArrays[r, c].GameObj == null)
+                        //    Debug.Log(r + "," + c);
+                    }
+                }
+
+                for(int r = 0; r<MaxRow;r++)
+                {
+                    for(int c = 0; c<MaxColumn; c++)
+                    {
+                        if(BoxArrays[r,c].GameObj == null)
+                        {
+                            for(int nC = c+1; nC < MaxColumn; nC++)
+                            {
+                                if (BoxArrays[r, nC].GameObj != null)
+                                {
+                                    var temp = BoxArrays[r, nC];
+                                    BoxArrays[r, c] = BoxArrays[r, c].SetGameObj(temp.GameObj);
+                                    BoxArrays[r, c] = BoxArrays[r, c].SetType(temp.BoxType);
+                                    BoxArrays[r, c].GameObj.name = r.ToString() + c.ToString();
+
+                                    BoxArrays[r, nC] = BoxArrays[r, nC].UnSetGameObj();
+                                    BoxArrays[r, nC] = BoxArrays[r, nC].UnSetType();
+
+
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                foreach(var s in BoxArrays)
+                {
+                    if(s.GameObj != null)
+                    {
+                        //Debug.Log(s.BoxPosition.X + " " + s.BoxPosition.Y  + ", " +  s.GameObj.name);
+                    }
+                    if (s.GameObj == null)
+                    {
+                        Debug.Log(s.BoxPosition.X + " " + s.BoxPosition.Y + " : NULL" );
+                    }
+                }
+
+                var types = new BoxType.IType[MaxRow, MaxColumn];
+
+                for (int c = 0; c < MaxColumn; c++)
+                {
+                    for (int r = 0; r < MaxRow; r++)
+                    {
+                        if (BoxArrays[r, c].GameObj == null)
+                        {
+                            var type = BoxType.CreateBy((BoxType.BoxColorNum)random.Next(1, BoxType.BoxTypeCount + 1));
+
+                            BoxArrays[r, c] = BoxArrays[r, c].SetTypeWithRegenerate(type);
+                        }
+
+                        types[r, c] = BoxArrays[r, c].BoxType;
+                    }
+                }
+
+                GroupListArray = MatchBoxes(MaxRow, MaxColumn, BoxArrays);
+
+                for (int i = 0; i < GroupListArray.GetLength(0); i++)
+                {
+                    if (GroupListArray[i] != null)
+                    {
+                        foreach (var temp in GroupListArray[i])
+                        {
+                            var boxName = new BoxName(temp.X.ToString() + temp.Y.ToString());
+                            BoxArrays[temp.X, temp.Y] = BoxArrays[temp.X, temp.Y].SetGroupNum(i);
+                        }
+                    }
+                }
+            }
+
+            private void FillTileAfterRefresh(int row, int column)
+            {
+                var random = new Random();
+
+                var types = new BoxType.IType[row, column];
+
+                for(int r = 0; r < row; r++)
+                {
+                    for(int c = 0; c < column; c++)
+                    {
+                        if(BoxArrays[r,c].GameObj == null)
+                        {
+                            var type = BoxType.CreateBy((BoxType.BoxColorNum)random.Next(1, BoxType.BoxTypeCount + 1));
+
+                            BoxArrays[r, c] = BoxArrays[r, c].SetType(type);
+                        }
+
+                        types[r, c] = BoxArrays[r, c].BoxType;
+                    }
+                }
+
+                GroupListArray = MatchBoxes(row, column, BoxArrays);
+
+                for(int i = 0; i < GroupListArray.GetLength(0); i++)
+                {
+                    if(GroupListArray[i] != null)
+                    {
+                        foreach (var temp in GroupListArray[i])
+                        {
+                            var boxName = new BoxName(temp.X.ToString() + temp.Y.ToString());
+                            BoxArrays[temp.X, temp.Y] = BoxArrays[temp.X, temp.Y].SetGroupNum(i);
+
+                            UnityEngine.Debug.Log(i + "번째" + BoxArrays[temp.X, temp.Y].BoxType.Value);
+                        }
+                    }
+                }
+            }
+
 
             /// <summary>
             /// キャッシュメモリ削除
@@ -131,7 +327,7 @@ namespace ManeProject.Infrastructure.Repository.Cache
                 IsStored = false;
             }
 
-            public IBoxArray[,] InitBoxArray(DBArray[] DBInfo)
+            public IBoxArray[,] InitBoxArray(List<DBArray> DBInfo)
             {
                 IsStored = false;
                 var rowColumnCount = (int)Math.Sqrt(DBInfo.Count());
@@ -144,8 +340,7 @@ namespace ManeProject.Infrastructure.Repository.Cache
 
             public IBoxArray[,] GetBlockArray() => IsStored ? BoxArrays : throw new NullReferenceException();
 
-
-            private List<GroupPosition>[] MatchBoxes(int maxrow, int maxcolumn, BoxType.IType[,] boxTypes)
+            private List<GroupPosition>[] MatchBoxes(int maxrow, int maxcolumn, IBoxArray[,] boxes)
             {
                 // Bool は宣言時に false になってるため、初期化は不要
                 var visited = new bool[maxrow, maxcolumn];
@@ -161,7 +356,7 @@ namespace ManeProject.Infrastructure.Repository.Cache
                         if (visited[row, column] != true)
                         {
                             tList[tempCount] = new List<GroupPosition>();
-                            Dfs(row, column, maxrow, maxcolumn, boxTypes[row, column], boxTypes, tList[tempCount], visited);
+                            MatchDfs(row, column, maxrow, maxcolumn, boxes[row, column].BoxType, boxes, tList[tempCount], visited);
                             tempCount++;
                         }
                     }
@@ -181,13 +376,13 @@ namespace ManeProject.Infrastructure.Repository.Cache
             /// <param name="types">生成されている配列のタイプたち</param>
             /// <param name="temp"></param>
             /// <param name="visited">訪問情報の配列</param>
-            private static void Dfs(
+            private static void MatchDfs(
                 int row,
                 int column,
                 int maxRow,
                 int maxColumn,
                 BoxType.IType type,
-                BoxType.IType[,] types,
+                IBoxArray[,] boxes,
                 List<GroupPosition> temp,
                 bool[,] visited)
             {
@@ -197,9 +392,9 @@ namespace ManeProject.Infrastructure.Repository.Cache
                 {
                     var dr = row + dir[r, 0];
                     var dc = column + dir[r, 1];
-                    if (canCheck(dr, dc, maxRow, maxColumn) && types[dr, dc] == type && visited[dr, dc] != true)
+                    if (canCheck(dr, dc, maxRow, maxColumn) && boxes[dr, dc].BoxType == type && visited[dr, dc] != true)
                     {
-                        Dfs(dr, dc, maxRow, maxColumn, type, types, temp, visited);
+                        MatchDfs(dr, dc, maxRow, maxColumn, type, boxes, temp, visited);
                     }
                 }
 

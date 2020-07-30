@@ -21,42 +21,51 @@ public class DBTest : MonoBehaviour
     private GameObject mouseDownSelectedObj;
     private GameObject mouseUpSelectedObj;
 
+    private int m_tileRow;
+    private int m_tileColumn;
 
-    private GameObject MainCanvas;
+
     // Use this for initialization
 
     private void Awake()
     {
-        MainCanvas = GameObject.Find("MainCanvas");
+
     }
 
     async void Start()
     {
 
         await DBConnect.Initialize();
-        var ttest = DBConnect.SQLConnect.DatabasePath;
 
-        var test = BoxRepository.Instance;
+        var test2 = await BoxRepository.Instance.CreateBoxArray();
 
-        var Random = new Randomm();
+        var row = test2.GetLength(0);
+        var column = test2.GetLength(1);
 
-        var test2 =await test.CreateBoxArray(); 
+        GameObject boxObject;
 
-        foreach (var s in test2)
+        for(int r = 0; r < row; r++)
         {
-            if (s == null)
-                Debug.Log("null");
-            switch (s.BoxType)
+            for(int c = 0; c< column; c++)
             {
-                case var _ when BoxType.Red == s.BoxType: 
-                    Instantiate(Red, new Vector3(s.BoxPosition.X,s.BoxPosition.Y,s.BoxPosition.Z),new Quaternion());
-                    break;
-                case var _ when BoxType.Blue == s.BoxType:
-                    Instantiate(Blue, new Vector3(s.BoxPosition.X, s.BoxPosition.Y, s.BoxPosition.Z), new Quaternion());
-                    break;
-                case var _ when BoxType.Yellow == s.BoxType:
-                    Instantiate(Yellow, new Vector3(s.BoxPosition.X, s.BoxPosition.Y, s.BoxPosition.Z), new Quaternion());
-                    break;
+                switch (test2[r,c].BoxType)
+                {
+                    case var _ when BoxType.Red == test2[r, c].BoxType:
+                        boxObject = Instantiate(Red, new Vector3(test2[r, c].BoxPosition.X, test2[r, c].BoxPosition.Y, test2[r, c].BoxPosition.Z), new Quaternion());
+                        boxObject.name = test2[r, c].BoxName.Value;
+                        test2[r, c] = test2[r, c].SetGameObj(boxObject);
+                        break;
+                    case var _ when BoxType.Blue == test2[r, c].BoxType:
+                        boxObject = Instantiate(Blue, new Vector3(test2[r, c].BoxPosition.X, test2[r, c].BoxPosition.Y, test2[r, c].BoxPosition.Z), new Quaternion());
+                        boxObject.name = test2[r, c].BoxName.Value;
+                        test2[r, c] = test2[r, c].SetGameObj(boxObject);
+                        break;
+                    case var _ when BoxType.Yellow == test2[r, c].BoxType:
+                        boxObject = Instantiate(Yellow, new Vector3(test2[r, c].BoxPosition.X, test2[r, c].BoxPosition.Y, test2[r, c].BoxPosition.Z), new Quaternion());
+                        boxObject.name = test2[r, c].BoxName.Value;
+                        test2[r, c] = test2[r, c].SetGameObj(boxObject);
+                        break;
+                }
             }
         }
     }
@@ -73,7 +82,6 @@ public class DBTest : MonoBehaviour
 
             if (Physics.Raycast(ray.origin, ray.direction, out hit))
             {
-                Debug.Log("12345");
                 mouseDownSelectedObj = hit.transform.gameObject;
             }
         }
@@ -90,7 +98,49 @@ public class DBTest : MonoBehaviour
 
             if (mouseUpSelectedObj != null && mouseDownSelectedObj != null && mouseDownSelectedObj == mouseUpSelectedObj)
             {
-                Debug.Log("Ho!");
+
+                var row = int.Parse(mouseUpSelectedObj.name.Substring(0, 1));
+
+                var column = int.Parse(mouseUpSelectedObj.name.Substring(1, 1));
+
+                var test = BoxRepository.Instance.TryDelete(row, column);
+
+                var test2 = test.BoxList;
+
+                for (int r = 0; r < test2.GetLength(0); r++)
+                {
+                    for (int c = 0; c < test2.GetLength(1); c++)
+                    {
+                        GameObject boxObject;
+
+                        if (test2[r,c].GameObj != null)
+                        {
+                            test2[r, c].GameObj.transform.position = new Vector3(test2[r, c].BoxPosition.X, test2[r, c].BoxPosition.Y, test2[r, c].BoxPosition.Z);
+                        }
+
+                        if (test2[r, c].IsRegenerated && test2[r, c].GameObj == null)
+                        {
+                            switch (test2[r, c].BoxType)
+                            {
+                                case var _ when BoxType.Red == test2[r, c].BoxType:
+                                    boxObject = Instantiate(Red, new Vector3(test2[r, c].BoxPosition.X, test2[r, c].BoxPosition.Y, test2[r, c].BoxPosition.Z), new Quaternion());
+                                    boxObject.name = test2[r, c].BoxName.Value;
+                                    test2[r, c] = test2[r, c].SetGameObj(boxObject);
+                                    break;
+                                case var _ when BoxType.Blue == test2[r, c].BoxType:
+                                    boxObject = Instantiate(Blue, new Vector3(test2[r, c].BoxPosition.X, test2[r, c].BoxPosition.Y, test2[r, c].BoxPosition.Z), new Quaternion());
+                                    boxObject.name = test2[r, c].BoxName.Value;
+                                    test2[r, c] = test2[r, c].SetGameObj(boxObject);
+                                    break;
+                                case var _ when BoxType.Yellow == test2[r, c].BoxType:
+                                    boxObject = Instantiate(Yellow, new Vector3(test2[r, c].BoxPosition.X, test2[r, c].BoxPosition.Y, test2[r, c].BoxPosition.Z), new Quaternion());
+                                    boxObject.name = test2[r, c].BoxName.Value;
+                                    test2[r, c] = test2[r, c].SetGameObj(boxObject);
+                                    break;
+                            }
+                        }
+                    }
+                }
             }
 
             mouseDownSelectedObj = null;

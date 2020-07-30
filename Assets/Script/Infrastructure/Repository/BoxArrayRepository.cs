@@ -23,9 +23,17 @@ namespace ManeProject.Infrastructure.Repository
 
             public Task<IBoxArray[,]> CreateBoxArray()
             {
-                var dbArray = DBConnect.SQLConnect.Table<DBArray>().ToArray();
+                var dbArray = DBConnect.SQLConnect.Table<DBArray>().ToList();
 
                 return Task.FromResult(m_cache.InitBoxArray(dbArray));
+            }
+
+                
+            public DeleteResult TryDelete(int row,int column) => m_cache.TryDelete(row, column);
+
+            public void DeleteArray(int ArrayNum)
+            {
+
             }
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using ManeProject.Infrastructure.DB;
+using UnityEngine;
 
 namespace ManeProject.Domain.Box
 {
@@ -24,9 +25,38 @@ namespace ManeProject.Domain.Box
         bool IsDeletable { get; }
 
         /// <summary>
+        /// 再生成された Box なのか
+        /// </summary>
+        bool IsRegenerated { get; }
+
+        /// <summary>
         /// グループになるリストの番号
         /// </summary>
         int GroupListNum { get; }
+
+        /// <summary>
+        /// Box のゲームオブジェクト
+        /// </summary>
+        GameObject GameObj { get; }
+
+        /// <summary>
+        /// Box のネーム
+        /// </summary>
+        BoxName BoxName { get; }
+
+        IBoxArray SetGameObj(GameObject gameObject);
+
+        IBoxArray SetPosition(Position position);
+
+        IBoxArray UnSetGameObj();
+
+        IBoxArray UnSetType();
+
+        IBoxArray SetTypeWithRegenerate(BoxType.IType type);
+
+        IBoxArray SetType(BoxType.IType type);
+
+        IBoxArray SetGroupNum(int num);
     }
 
     /// <summary>
@@ -43,11 +73,19 @@ namespace ManeProject.Domain.Box
         public static IBoxArray Create(
                 Position boxPosition,
                 BoxType.IType boxType,
-                int groupListNum
+                int groupListNum,
+                bool isDeleteable,
+                bool isRegenerated,
+                GameObject gameObject,
+                BoxName boxName
             ) => new BoxArrayImpl(
                 boxPosition,
                 boxType,
-                groupListNum
+                groupListNum,
+                isDeleteable,
+                isRegenerated,
+                gameObject,
+                boxName
             );
 
         private sealed class BoxArrayImpl : IBoxArray
@@ -68,9 +106,101 @@ namespace ManeProject.Domain.Box
             public bool IsDeletable { get; }
 
             /// <summary>
+            /// 現在削除できる状態か
+            /// </summary>
+            public bool IsRegenerated { get; }
+
+            /// <summary>
             /// グループとなるリストの番号
             /// </summary>
             public int GroupListNum { get; }
+
+            /// <summary>
+            /// Box のネーム
+            /// </summary>
+            public BoxName BoxName { get; }
+
+            /// <summary>
+            /// Box のネーム
+            /// </summary>
+            public GameObject GameObj { get; }
+
+            public IBoxArray SetGameObj(GameObject gameObject)
+                => new BoxArrayImpl(
+                    BoxPosition,
+                    BoxType,
+                    GroupListNum,
+                    IsDeletable,
+                    IsRegenerated,
+                    gameObject,
+                    BoxName
+                    );
+
+            public IBoxArray SetPosition(Position position)
+                => new BoxArrayImpl(
+                    position,
+                    BoxType,
+                    GroupListNum,
+                    IsDeletable,
+                    IsRegenerated,
+                    GameObj,
+                    BoxName
+                    );
+
+            public IBoxArray UnSetGameObj()
+                => new BoxArrayImpl(
+                    BoxPosition,
+                    BoxType,
+                    GroupListNum,
+                    IsDeletable,
+                    IsRegenerated,
+                    null,
+                    BoxName
+                    );
+
+            public IBoxArray UnSetType()
+                => new BoxArrayImpl(
+                    BoxPosition,
+                    null,
+                    GroupListNum,
+                    IsDeletable,
+                    IsRegenerated,
+                    GameObj,
+                    BoxName
+                    );
+
+            public IBoxArray SetTypeWithRegenerate(BoxType.IType type)
+                => new BoxArrayImpl(
+                    BoxPosition,
+                    type,
+                    GroupListNum,
+                    true,
+                    true,
+                    GameObj,
+                    BoxName
+                    );
+
+            public IBoxArray SetType(BoxType.IType type)
+                => new BoxArrayImpl(
+                    BoxPosition,
+                    type,
+                    GroupListNum,
+                    IsDeletable,
+                    IsRegenerated,
+                    GameObj,
+                    BoxName
+                    );
+
+            public IBoxArray SetGroupNum(int num)
+                => new BoxArrayImpl(
+                    BoxPosition,
+                    BoxType,
+                    num,
+                    IsDeletable,
+                    IsRegenerated,
+                    GameObj,
+                    BoxName
+                    );
 
             /// <summary>
             /// コンストラクター
@@ -80,17 +210,27 @@ namespace ManeProject.Domain.Box
             public BoxArrayImpl(
                     Position boxPosition,
                     BoxType.IType boxType,
-                    int groupListNum
+                    int groupListNum,
+                    bool isDeletable,
+                    bool isRegenerated,
+                    GameObject gameObject,
+                    BoxName boxName
                 ) => (
                     BoxPosition,
                     BoxType,
                     GroupListNum,
-                    IsDeletable
+                    IsDeletable,
+                    IsRegenerated,
+                    GameObj,
+                    BoxName
                 ) = (
                     boxPosition,
                     boxType,
                     groupListNum,
-                    false
+                    isDeletable,
+                    isRegenerated,
+                    gameObject,
+                    boxName
                 );
         }
     }
