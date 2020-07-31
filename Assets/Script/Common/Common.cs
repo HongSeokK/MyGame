@@ -4,8 +4,8 @@ namespace ManeProject.Common
 {
     public static class Common
     {
-        public const string BOX_NAME = "Box_";
+        public const int DEFAULT_MAX_COLUMN = 8;
 
-
+        public const int DEFAULT_MAX_ROW = 8;
     }
 }

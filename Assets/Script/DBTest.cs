@@ -21,10 +21,6 @@ public class DBTest : MonoBehaviour
     private GameObject mouseDownSelectedObj;
     private GameObject mouseUpSelectedObj;
 
-    private int m_tileRow;
-    private int m_tileColumn;
-
-
     // Use this for initialization
 
     private void Awake()
@@ -106,6 +102,8 @@ public class DBTest : MonoBehaviour
                 var test = BoxRepository.Instance.TryDelete(row, column);
 
                 var test2 = test.BoxList;
+
+                Debug.Log(mouseUpSelectedObj.name);
 
                 for (int r = 0; r < test2.GetLength(0); r++)
                 {

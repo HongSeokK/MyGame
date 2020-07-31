@@ -117,7 +117,7 @@ namespace ManeProject.Infrastructure.Repository.Cache
                     r++;
                 }
 
-                GroupListArray = MatchBoxes(row, column, BoxArrays);
+                GroupListArray = MatchBoxes(row, column, returnArray);
 
                 for (int i = 0; i < GroupListArray.GetLength(0); i++)
                 {
@@ -200,15 +200,6 @@ namespace ManeProject.Infrastructure.Repository.Cache
 
                 var random = new Random();
 
-                for(int r = 0; r < MaxRow; r++)
-                {
-                    for(int c = 0; c < MaxColumn; c++)
-                    {
-                        //if (BoxArrays[r, c].GameObj == null)
-                        //    Debug.Log(r + "," + c);
-                    }
-                }
-
                 for(int r = 0; r<MaxRow;r++)
                 {
                     for(int c = 0; c<MaxColumn; c++)
@@ -235,19 +226,6 @@ namespace ManeProject.Infrastructure.Repository.Cache
                     }
                 }
 
-                foreach(var s in BoxArrays)
-                {
-                    if(s.GameObj != null)
-                    {
-                        //Debug.Log(s.BoxPosition.X + " " + s.BoxPosition.Y  + ", " +  s.GameObj.name);
-                    }
-                    if (s.GameObj == null)
-                    {
-                        Debug.Log(s.BoxPosition.X + " " + s.BoxPosition.Y + " : NULL" );
-                    }
-                }
-
-                var types = new BoxType.IType[MaxRow, MaxColumn];
 
                 for (int c = 0; c < MaxColumn; c++)
                 {
@@ -259,8 +237,6 @@ namespace ManeProject.Infrastructure.Repository.Cache
 
                             BoxArrays[r, c] = BoxArrays[r, c].SetTypeWithRegenerate(type);
                         }
-
-                        types[r, c] = BoxArrays[r, c].BoxType;
                     }
                 }
 
@@ -274,44 +250,6 @@ namespace ManeProject.Infrastructure.Repository.Cache
                         {
                             var boxName = new BoxName(temp.X.ToString() + temp.Y.ToString());
                             BoxArrays[temp.X, temp.Y] = BoxArrays[temp.X, temp.Y].SetGroupNum(i);
-                        }
-                    }
-                }
-            }
-
-            private void FillTileAfterRefresh(int row, int column)
-            {
-                var random = new Random();
-
-                var types = new BoxType.IType[row, column];
-
-                for(int r = 0; r < row; r++)
-                {
-                    for(int c = 0; c < column; c++)
-                    {
-                        if(BoxArrays[r,c].GameObj == null)
-                        {
-                            var type = BoxType.CreateBy((BoxType.BoxColorNum)random.Next(1, BoxType.BoxTypeCount + 1));
-
-                            BoxArrays[r, c] = BoxArrays[r, c].SetType(type);
-                        }
-
-                        types[r, c] = BoxArrays[r, c].BoxType;
-                    }
-                }
-
-                GroupListArray = MatchBoxes(row, column, BoxArrays);
-
-                for(int i = 0; i < GroupListArray.GetLength(0); i++)
-                {
-                    if(GroupListArray[i] != null)
-                    {
-                        foreach (var temp in GroupListArray[i])
-                        {
-                            var boxName = new BoxName(temp.X.ToString() + temp.Y.ToString());
-                            BoxArrays[temp.X, temp.Y] = BoxArrays[temp.X, temp.Y].SetGroupNum(i);
-
-                            UnityEngine.Debug.Log(i + "번째" + BoxArrays[temp.X, temp.Y].BoxType.Value);
                         }
                     }
                 }
