@@ -30,11 +30,6 @@ namespace ManeProject.Infrastructure.Repository
 
                 
             public DeleteResult TryDelete(int row,int column) => m_cache.TryDelete(row, column);
-
-            public void DeleteArray(int ArrayNum)
-            {
-
-            }
         }
     }
 }

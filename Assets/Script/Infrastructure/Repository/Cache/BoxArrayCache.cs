@@ -126,6 +126,7 @@ namespace ManeProject.Infrastructure.Repository.Cache
                         foreach (var temp in GroupListArray[i])
                         {
                             var boxName = new BoxName(temp.X.ToString() + temp.Y.ToString());
+                            returnArray[temp.X, temp.Y] = returnArray[temp.X, temp.Y].SetGroupNum(i);
                         }
                     }
                 }
