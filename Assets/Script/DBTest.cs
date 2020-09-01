@@ -22,8 +22,9 @@ public class DBTest : MonoBehaviour
     private GameObject mouseDownSelectedObj;
     private GameObject mouseUpSelectedObj;
 
-    // Use this for initialization
+    private bool IsBoxesMoving;
 
+    // Use this for initialization
     private void Awake()
     {
         InitScene();
@@ -36,8 +37,11 @@ public class DBTest : MonoBehaviour
 
         var boxInfo = await BoxRepository.Instance.CreateBoxArray();
 
+
         var row = boxInfo.GetLength(0);
         var column = boxInfo.GetLength(1);
+
+        IsBoxesMoving = false;
 
         GameObject boxObject;
 
@@ -48,17 +52,17 @@ public class DBTest : MonoBehaviour
                 switch (boxInfo[r,c].BoxType)
                 {
                     case var _ when BoxType.Red == boxInfo[r, c].BoxType:
-                        boxObject = Instantiate(Red, new Vector3(boxInfo[r, c].BoxPosition.X, boxInfo[r, c].BoxPosition.Y, boxInfo[r, c].BoxPosition.Z), new Quaternion());
+                        boxObject = Instantiate(Red, boxInfo[r, c].BoxPosition, new Quaternion());
                         boxObject.name = boxInfo[r, c].BoxName.Value;
                         boxInfo[r, c] = boxInfo[r, c].SetGameObj(boxObject);
                         break;
                     case var _ when BoxType.Blue == boxInfo[r, c].BoxType:
-                        boxObject = Instantiate(Blue, new Vector3(boxInfo[r, c].BoxPosition.X, boxInfo[r, c].BoxPosition.Y, boxInfo[r, c].BoxPosition.Z), new Quaternion());
+                        boxObject = Instantiate(Blue, boxInfo[r, c].BoxPosition, new Quaternion());
                         boxObject.name = boxInfo[r, c].BoxName.Value;
                         boxInfo[r, c] = boxInfo[r, c].SetGameObj(boxObject);
                         break;
                     case var _ when BoxType.Yellow == boxInfo[r, c].BoxType:
-                        boxObject = Instantiate(Yellow, new Vector3(boxInfo[r, c].BoxPosition.X, boxInfo[r, c].BoxPosition.Y, boxInfo[r, c].BoxPosition.Z), new Quaternion());
+                        boxObject = Instantiate(Yellow, boxInfo[r, c].BoxPosition, new Quaternion());
                         boxObject.name = boxInfo[r, c].BoxName.Value;
                         boxInfo[r, c] = boxInfo[r, c].SetGameObj(boxObject);
                         break;
@@ -70,7 +74,7 @@ public class DBTest : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        CheckTouch();
+        if(!IsBoxesMoving) CheckTouch();
     }
 
     private void CheckTouch()
@@ -99,53 +103,15 @@ public class DBTest : MonoBehaviour
 
             if (mouseUpSelectedObj != null && mouseDownSelectedObj != null && mouseDownSelectedObj == mouseUpSelectedObj)
             {
-
                 var row = int.Parse(mouseUpSelectedObj.name.Substring(0, 1));
 
                 var column = int.Parse(mouseUpSelectedObj.name.Substring(1, 1));
 
-                var test = BoxRepository.Instance.TryDelete(row, column);
+                var result = BoxRepository.Instance.TryDelete(row, column);
 
-                var test2 = test.BoxList;
+                var BoxList = result.BoxList;
 
-                Debug.Log(mouseUpSelectedObj.name);
-
-                for (int r = 0; r < test2.GetLength(0); r++)
-                {
-                    for (int c = 0; c < test2.GetLength(1); c++)
-                    {
-                        GameObject boxObject;
-
-                        if (test2[r, c].IsRegenerated && test2[r, c].GameObj == null)
-                        {
-                            switch (test2[r, c].BoxType)
-                            {
-                                case var _ when BoxType.Red == test2[r, c].BoxType:
-                                    boxObject = Instantiate(Red, new Vector3(test2[r, c].BoxPosition.X, Common.REGENERATED_Y, test2[r, c].BoxPosition.Z), new Quaternion());
-                                    boxObject.name = test2[r, c].BoxName.Value;
-                                    test2[r, c] = test2[r, c].SetGameObj(boxObject);
-                                    break;
-                                case var _ when BoxType.Blue == test2[r, c].BoxType:
-                                    boxObject = Instantiate(Blue, new Vector3(test2[r, c].BoxPosition.X, Common.REGENERATED_Y, test2[r, c].BoxPosition.Z), new Quaternion());
-                                    boxObject.name = test2[r, c].BoxName.Value;
-                                    test2[r, c] = test2[r, c].SetGameObj(boxObject);
-                                    break;
-                                case var _ when BoxType.Yellow == test2[r, c].BoxType:
-                                    boxObject = Instantiate(Yellow, new Vector3(test2[r, c].BoxPosition.X, Common.REGENERATED_Y, test2[r, c].BoxPosition.Z), new Quaternion());
-                                    boxObject.name = test2[r, c].BoxName.Value;
-                                    test2[r, c] = test2[r, c].SetGameObj(boxObject);
-                                    break;
-                            }
-                        }
-
-                        if (test2[r, c].GameObj != null
-                            && test2[r, c].GameObj.transform.position != new Vector3(test2[r, c].BoxPosition.X, test2[r, c].BoxPosition.Y, test2[r, c].BoxPosition.Z))
-                        {
-                            Debug.Log(";;");
-                            StartCoroutine(PositionChange(test2[r, c].GameObj, new Vector3(test2[r, c].BoxPosition.X, test2[r, c].BoxPosition.Y, test2[r, c].BoxPosition.Z)));
-                        }
-                    }
-                }
+                EE(BoxList);
             }
             mouseDownSelectedObj = null;
             mouseUpSelectedObj = null;
@@ -153,24 +119,72 @@ public class DBTest : MonoBehaviour
     }
 
 
+    private void EE(IBoxArray[,] BoxList)
+    {
+        for (int r = 0; r < BoxList.GetLength(0); r++)
+        {
+            for (int c = 0; c < BoxList.GetLength(1); c++)
+            {
+                GameObject boxObject;
+
+                if (BoxList[r, c].IsRegenerated && BoxList[r, c].GameObj == null)
+                {
+                    var CreatePos = new Vector3(BoxList[r, c].BoxPosition.x, Common.REGENERATED_Y, BoxList[r, c].BoxPosition.z);
+                    switch (BoxList[r, c].BoxType)
+                    {
+                        case var _ when BoxType.Red == BoxList[r, c].BoxType:
+                            boxObject = Instantiate(Red, CreatePos, new Quaternion());
+                            boxObject.name = BoxList[r, c].BoxName.Value;
+                            BoxList[r, c] = BoxList[r, c].SetGameObj(boxObject);
+                            break;
+                        case var _ when BoxType.Blue == BoxList[r, c].BoxType:
+                            boxObject = Instantiate(Blue, CreatePos, new Quaternion());
+                            boxObject.name = BoxList[r, c].BoxName.Value;
+                            BoxList[r, c] = BoxList[r, c].SetGameObj(boxObject);
+                            break;
+                        case var _ when BoxType.Yellow == BoxList[r, c].BoxType:
+                            boxObject = Instantiate(Yellow, CreatePos, new Quaternion());
+                            boxObject.name = BoxList[r, c].BoxName.Value;
+                            BoxList[r, c] = BoxList[r, c].SetGameObj(boxObject);
+                            break;
+                    }
+                }
+
+                if (BoxList[r, c].GameObj != null
+                    && BoxList[r, c].GameObj.transform.position != BoxList[r, c].BoxPosition)
+                {
+                    StartCoroutine(PositionChange(BoxList[r, c].GameObj, BoxList[r, c].BoxPosition));
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// ボックス移動コルティン
+    /// </summary>
+    /// <param name="currentPos">ゲームオブジェクトの現在位置</param>
+    /// <param name="Pos">移動位置</param>
+    /// <returns></returns>
+    /// <remarks>
+    /// コルティンチェック方式は下記のリンクを参照しました。
+    /// https://answers.unity.com/questions/126783/can-i-check-if-a-coroutine-is-running.html
+    /// </remarks>
     private IEnumerator PositionChange(GameObject currentPos, Vector3 Pos)
     {
-        var dir = (Pos - currentPos.transform.position).normalized;
-
-        Debug.Log(Pos);
-
         var speed = Vector2.Distance(currentPos.transform.position, Pos) / 100f;
+
         while (true)
         {
-            ///currentPos.transform.position += dir * speed;
             currentPos.transform.position = Vector3.MoveTowards(currentPos.transform.position, Pos, speed);
             if (Vector2.Distance(Pos, currentPos.transform.position) == 0)
             {
                 Debug.Log("breaked");
                 break;
             }
+            IsBoxesMoving = true;
 
             yield return null;
         }
+        IsBoxesMoving = false;
     }
 }
