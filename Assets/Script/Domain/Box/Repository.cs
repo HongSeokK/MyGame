@@ -38,6 +38,5 @@ namespace ManeProject.Domain.Box
     {
         public IBoxArray[,] BoxList { get; set; }
 
-        public bool IsDeleteable { get; set; }
     }
 }

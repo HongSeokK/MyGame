@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace ManeProject.Common
 {
@@ -7,5 +8,7 @@ namespace ManeProject.Common
         public const int DEFAULT_MAX_COLUMN = 8;
 
         public const int DEFAULT_MAX_ROW = 8;
+
+        public const int REGENERATED_Y = 10;
     }
 }
