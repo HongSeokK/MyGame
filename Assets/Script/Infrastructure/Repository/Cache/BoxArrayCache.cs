@@ -71,8 +71,6 @@ namespace ManeProject.Infrastructure.Repository.Cache
                 var random = new Random();
 
                 var returnArray = new IBoxArray[row, column];
-                var positions = new Position[row, column];
-                var types = new BoxType.IType[row, column];
 
                 var redCount = 0;
                 var blueCount = 0;
@@ -166,9 +164,6 @@ namespace ManeProject.Infrastructure.Repository.Cache
 
             public DeleteResult TryDelete(int row, int column)
             {
-
-                var returnList = new List<IBoxArray>();
-
                 var target = BoxArrays[row, column];
 
                 if (IsStored)
@@ -184,21 +179,21 @@ namespace ManeProject.Infrastructure.Repository.Cache
                         {
                             Destroy(BoxArrays[box.X, box.Y].GameObj);
                             BoxArrays[box.X, box.Y] = BoxArrays[box.X, box.Y].UnSetGameObj();
-                            returnList.Add(BoxArrays[box.X, box.Y]);
                         }
 
                         RefreshAfterTileClean();
                     }
-                    return new DeleteResult { BoxList = BoxArrays, IsDeleteable = isDeleteable };
+                    return new DeleteResult { BoxList = BoxArrays };
                 }
 
                 throw new NullReferenceException();
             }
 
+            /// <summary>
+            /// 
+            /// </summary>
             private void RefreshAfterTileClean()
             {
-                List<GroupPosition> emptyArray = new List<GroupPosition>();
-
                 var random = new Random();
 
                 for(int r = 0; r<MaxRow;r++)
@@ -218,8 +213,6 @@ namespace ManeProject.Infrastructure.Repository.Cache
 
                                     BoxArrays[r, nC] = BoxArrays[r, nC].UnSetGameObj();
                                     BoxArrays[r, nC] = BoxArrays[r, nC].UnSetType();
-
-
                                     break;
                                 }
                             }
