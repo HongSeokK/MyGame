@@ -36,7 +36,7 @@ namespace ManeProject.Scene.GameMain
         async void InitScene()
         {
 
-            await DBConnect.Initialize();
+            await DBManager.Initialize();
 
             var boxInfo = await BoxRepository.Instance.CreateBoxArray();
 

@@ -23,7 +23,7 @@ namespace ManeProject.Infrastructure.Repository
 
             public Task<IBoxArray[,]> CreateBoxArray()
             {
-                var dbArray = DBConnect.SQLConnect.Table<DBArray>().ToList();
+                var dbArray = DBManager.SQLConnect.Table<DBArray>().ToList();
 
                 return Task.FromResult(m_cache.InitBoxArray(dbArray));
             }
