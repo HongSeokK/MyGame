@@ -106,7 +106,7 @@ namespace ManeProject.Infrastructure.Repository.Cache
                                 yellowCount++;
                                 break;
                         }
-                        var position = new Position(DBArray[createdCount].PositionX, DBArray[createdCount].PositionY, 0);
+                        var position = new Vector3(DBArray[createdCount].PositionX, DBArray[createdCount].PositionY, 0);
                         var boxName = new BoxName(r.ToString() + c.ToString());
                         returnArray[r, c] = BoxArrayFactory.Create(position, type, 0, false, false, null, boxName);
                         c++;

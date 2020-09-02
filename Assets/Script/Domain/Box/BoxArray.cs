@@ -12,7 +12,7 @@ namespace ManeProject.Domain.Box
         /// <summary>
         /// Box の位置
         /// </summary>
-        Position BoxPosition { get; }
+        Vector3 BoxPosition { get; }
 
         /// <summary>
         /// Box のタイプ
@@ -46,7 +46,7 @@ namespace ManeProject.Domain.Box
 
         IBoxArray SetGameObj(GameObject gameObject);
 
-        IBoxArray SetPosition(Position position);
+        IBoxArray SetPosition(Vector3 position);
 
         IBoxArray UnSetGameObj();
 
@@ -71,7 +71,7 @@ namespace ManeProject.Domain.Box
         /// <param name="boxType"></param>
         /// <returns></returns>
         public static IBoxArray Create(
-                Position boxPosition,
+                Vector3 boxPosition,
                 BoxType.IType boxType,
                 int groupListNum,
                 bool isDeleteable,
@@ -93,7 +93,7 @@ namespace ManeProject.Domain.Box
             /// <summary>
             /// Box の位置
             /// </summary>
-            public Position BoxPosition { get; }
+            public Vector3 BoxPosition { get; }
 
             /// <summary>
             /// Box のタイプ
@@ -136,7 +136,7 @@ namespace ManeProject.Domain.Box
                     BoxName
                     );
 
-            public IBoxArray SetPosition(Position position)
+            public IBoxArray SetPosition(Vector3 position)
                 => new BoxArrayImpl(
                     position,
                     BoxType,
@@ -208,7 +208,7 @@ namespace ManeProject.Domain.Box
             /// <param name="boxPosition"></param>
             /// <param name="boxType"></param>
             public BoxArrayImpl(
-                    Position boxPosition,
+                    Vector3 boxPosition,
                     BoxType.IType boxType,
                     int groupListNum,
                     bool isDeletable,
