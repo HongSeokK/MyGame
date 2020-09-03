@@ -4,6 +4,7 @@ using Randomm = System.Random;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.UI;
 using ManeProject.Domain.Box;
 using ManeProject.Infrastructure.DB;
 using ManeProject.Infrastructure.Repository;
@@ -18,6 +19,8 @@ namespace ManeProject.Scene.GameMain
         private GameObject Blue;
         [SerializeField]
         private GameObject Yellow;
+        [SerializeField]
+        private Text ScoreText;
 
         private GameObject mouseDownSelectedObj;
         private GameObject mouseUpSelectedObj;
@@ -39,6 +42,7 @@ namespace ManeProject.Scene.GameMain
             await DBManager.Initialize();
 
             var boxInfo = await BoxRepository.Instance.CreateBoxArray();
+            var ScoreInfo = ScoreRepository.Instance.CreateScore(Common.Common.GAME_END_SCORE);
 
             var row = boxInfo.GetLength(0);
             var column = boxInfo.GetLength(1);
@@ -46,6 +50,8 @@ namespace ManeProject.Scene.GameMain
             IsBoxesMoving = false;
 
             GameObject boxObject;
+
+            ScoreText.text = ScoreInfo.m_NowScore.ToString();
 
             for (int r = 0; r < row; r++)
             {
@@ -77,7 +83,6 @@ namespace ManeProject.Scene.GameMain
         void Update()
         {
             // タッチを確認。
-            // TODO : 現在はマウスクリック判定で処理チェック中なんで、Touch 処理追加必要
             if (!IsBoxesMoving) CheckTouch();
         }
 
@@ -126,7 +131,11 @@ namespace ManeProject.Scene.GameMain
 
                             var BoxList = result.BoxList;
 
-                            RearrangeBoxes(BoxList);
+                            if (result.isDeleted)
+                            {
+                                RearrangeBoxes(BoxList);
+                                UpdateScore(result.DeletedCount);
+                            }
                         }
                         mouseDownSelectedObj = null;
                         mouseUpSelectedObj = null;
@@ -167,7 +176,11 @@ namespace ManeProject.Scene.GameMain
 
                     var BoxList = result.BoxList;
 
-                    if(result.isDeleted) RearrangeBoxes(BoxList);
+                    if (result.isDeleted)
+                    {
+                        RearrangeBoxes(BoxList);
+                        UpdateScore(result.DeletedCount);
+                    }
                 }
                 mouseDownSelectedObj = null;
                 mouseUpSelectedObj = null;
@@ -244,6 +257,16 @@ namespace ManeProject.Scene.GameMain
                 yield return null;
             }
             IsBoxesMoving = false;
+        }
+
+
+        private void UpdateScore(int deletedCount)
+        {
+            var Score = ScoreRepository.Instance.UpdateScore(deletedCount * Common.Common.BOX_SCORE);
+
+            if (Score.m_NowScore >= Score.m_EndGameScore) Debug.Log("EndGame");
+
+            ScoreText.text = Score.m_NowScore.ToString();
         }
     }
 }

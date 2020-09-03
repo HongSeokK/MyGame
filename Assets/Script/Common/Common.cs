@@ -12,5 +12,9 @@ namespace ManeProject.Common
         public const int REGENERATED_Y = 10;
 
         public const int COLOR_COUNT = 3;
+
+        public const int GAME_END_SCORE = 1000000;
+
+        public const int BOX_SCORE = 10000;
     }
 }
