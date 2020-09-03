@@ -15,8 +15,12 @@ namespace ManeProject.Infrastructure.Repository
 
         private static readonly Lazy<IRepository> instance = new Lazy<IRepository>(() => new BoxRepositoryImpl(BlockCache.Instance));
 
+        /// <summary>
+        /// ボックスレポジトリ
+        /// </summary>
         private sealed class BoxRepositoryImpl : IRepository
         {
+
             private readonly ICache m_cache;
 
             public BoxRepositoryImpl(ICache cache) => m_cache = cache;

@@ -237,7 +237,6 @@ namespace ManeProject.Scene.GameMain
                 currentPos.transform.position = Vector3.MoveTowards(currentPos.transform.position, Pos, speed);
                 if (Vector2.Distance(Pos, currentPos.transform.position) == 0)
                 {
-                    Debug.Log("breaked");
                     break;
                 }
                 IsBoxesMoving = true;
