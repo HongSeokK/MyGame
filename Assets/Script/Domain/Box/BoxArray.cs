@@ -44,18 +44,51 @@ namespace ManeProject.Domain.Box
         /// </summary>
         BoxName BoxName { get; }
 
+        /// <summary>
+        /// ゲームオブジェクト設定
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <returns></returns>
         IBoxArray SetGameObj(GameObject gameObject);
 
+        /// <summary>
+        /// ポジション設定
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         IBoxArray SetPosition(Vector3 position);
 
+        /// <summary>
+        /// ゲームオブジェクト設定削除
+        /// </summary>
+        /// <returns></returns>
         IBoxArray UnSetGameObj();
 
+        /// <summary>
+        /// タイプ設定削除
+        /// </summary>
+        /// <returns></returns>
         IBoxArray UnSetType();
 
+        /// <summary>
+        /// タイプ設定、再生成されたボックスに設定
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         IBoxArray SetTypeWithRegenerate(BoxType.IType type);
 
+        /// <summary>
+        /// タイプ設定
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         IBoxArray SetType(BoxType.IType type);
 
+        /// <summary>
+        /// グループナンバー設定
+        /// </summary>
+        /// <param name="num"></param>
+        /// <returns></returns>
         IBoxArray SetGroupNum(int num);
     }
 
@@ -125,6 +158,11 @@ namespace ManeProject.Domain.Box
             /// </summary>
             public GameObject GameObj { get; }
 
+            /// <summary>
+            /// ゲームオブジェクト設定
+            /// </summary>
+            /// <param name="gameObject"></param>
+            /// <returns></returns>
             public IBoxArray SetGameObj(GameObject gameObject)
                 => new BoxArrayImpl(
                     BoxPosition,
@@ -136,6 +174,11 @@ namespace ManeProject.Domain.Box
                     BoxName
                     );
 
+            /// <summary>
+            /// ポジション設定
+            /// </summary>
+            /// <param name="position"></param>
+            /// <returns></returns>
             public IBoxArray SetPosition(Vector3 position)
                 => new BoxArrayImpl(
                     position,
@@ -147,6 +190,10 @@ namespace ManeProject.Domain.Box
                     BoxName
                     );
 
+            /// <summary>
+            /// ゲームオブジェクト設定削除
+            /// </summary>
+            /// <returns></returns>
             public IBoxArray UnSetGameObj()
                 => new BoxArrayImpl(
                     BoxPosition,
@@ -158,6 +205,10 @@ namespace ManeProject.Domain.Box
                     BoxName
                     );
 
+            /// <summary>
+            /// タイプ設定削除
+            /// </summary>
+            /// <returns></returns>
             public IBoxArray UnSetType()
                 => new BoxArrayImpl(
                     BoxPosition,
@@ -169,6 +220,11 @@ namespace ManeProject.Domain.Box
                     BoxName
                     );
 
+            /// <summary>
+            /// タイプ設定、再生成されたボックスに設定
+            /// </summary>
+            /// <param name="type"></param>
+            /// <returns></returns>
             public IBoxArray SetTypeWithRegenerate(BoxType.IType type)
                 => new BoxArrayImpl(
                     BoxPosition,
@@ -180,6 +236,11 @@ namespace ManeProject.Domain.Box
                     BoxName
                     );
 
+            /// <summary>
+            /// タイプ設定
+            /// </summary>
+            /// <param name="type"></param>
+            /// <returns></returns>
             public IBoxArray SetType(BoxType.IType type)
                 => new BoxArrayImpl(
                     BoxPosition,
@@ -191,6 +252,11 @@ namespace ManeProject.Domain.Box
                     BoxName
                     );
 
+            /// <summary>
+            /// グループナンバー設定
+            /// </summary>
+            /// <param name="num"></param>
+            /// <returns></returns>
             public IBoxArray SetGroupNum(int num)
                 => new BoxArrayImpl(
                     BoxPosition,

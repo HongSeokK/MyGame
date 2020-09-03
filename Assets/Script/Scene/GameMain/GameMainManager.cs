@@ -167,7 +167,7 @@ namespace ManeProject.Scene.GameMain
 
                     var BoxList = result.BoxList;
 
-                    RearrangeBoxes(BoxList);
+                    if(result.isDeleted) RearrangeBoxes(BoxList);
                 }
                 mouseDownSelectedObj = null;
                 mouseUpSelectedObj = null;
