@@ -9,20 +9,35 @@ using UnityEngine;
 
 namespace ManeProject.Infrastructure.Repository.Cache
 {
-    public static class BlockCache
+    public static class BoxArrayCache
     {
         public static ICache Instance => instance.Value;
 
-        private sealed class BlockCacheImpl : MonoBehaviour, ICache
+        private sealed class BoxArrayCacheImpl : MonoBehaviour, ICache
         {
+            /// <summary>
+            /// キャッシュ内ボックス配列
+            /// </summary>
             private static IBoxArray[,] BoxArrays { get; set; }
 
+            /// <summary>
+            /// DB 情報
+            /// </summary>
             private static List<DBArray> DBArray { get; set; }
 
+            /// <summary>
+            /// キャッシュに配列が保存されているのか
+            /// </summary>
             public bool IsStored { get; private set; }
 
+            /// <summary>
+            /// 最大行
+            /// </summary>
             private int MaxRow { get; set; }
 
+            /// <summary>
+            /// 最大列
+            /// </summary>
             private int MaxColumn { get; set; }
 
             /// <summary>
@@ -132,6 +147,10 @@ namespace ManeProject.Infrastructure.Repository.Cache
                 return returnArray;
             }
 
+            /// <summary>
+            /// ボックス削除 ( GroupList での削除 )
+            /// </summary>
+            /// <param name="ListNum"></param>
             public void DeleteBoxes(int ListNum)
             {
                 if(IsStored)
@@ -144,6 +163,12 @@ namespace ManeProject.Infrastructure.Repository.Cache
                 }
             }
 
+            /// <summary>
+            /// 指定した行、列でのボックスグループを呼び出す
+            /// </summary>
+            /// <param name="row">行指定</param>
+            /// <param name="column">列指定</param>
+            /// <returns></returns>
             public List<IBoxArray> GetBoxArrayFromList(int row, int column)
             {
                 var returnList = new List<IBoxArray>();
@@ -162,6 +187,12 @@ namespace ManeProject.Infrastructure.Repository.Cache
                 throw new NullReferenceException();
             }
 
+            /// <summary>
+            /// 削除実行
+            /// </summary>
+            /// <param name="row">行指定</param>
+            /// <param name="column">列指定</param>
+            /// <returns></returns>
             public DeleteResult TryDelete(int row, int column)
             {
                 var target = BoxArrays[row, column];
@@ -173,6 +204,9 @@ namespace ManeProject.Infrastructure.Repository.Cache
                     var targetListCount = targetList.Count();
 
                     var isDeleteable = targetListCount >= 3;
+
+                    int deleteCount = 0;
+
                     if (isDeleteable)
                     {
                         foreach (var box in targetList)
@@ -181,16 +215,18 @@ namespace ManeProject.Infrastructure.Repository.Cache
                             BoxArrays[box.X, box.Y] = BoxArrays[box.X, box.Y].UnSetGameObj();
                         }
 
+                        deleteCount = targetListCount;
+
                         RefreshAfterTileClean();
                     }
-                    return new DeleteResult { BoxList = BoxArrays };
+                    return new DeleteResult { BoxList = BoxArrays, DeletedCount = deleteCount, isDeleted  = isDeleteable};
                 }
 
                 throw new NullReferenceException();
             }
 
             /// <summary>
-            /// 
+            /// ボックス削除後に再配置する
             /// </summary>
             private void RefreshAfterTileClean()
             {
@@ -259,6 +295,11 @@ namespace ManeProject.Infrastructure.Repository.Cache
                 IsStored = false;
             }
 
+            /// <summary>
+            /// キャッシュ内ボックス配列の初期化
+            /// </summary>
+            /// <param name="DBInfo"></param>
+            /// <returns></returns>
             public IBoxArray[,] InitBoxArray(List<DBArray> DBInfo)
             {
                 IsStored = false;
@@ -270,8 +311,19 @@ namespace ManeProject.Infrastructure.Repository.Cache
                 return BoxArrays;
             }
 
+            /// <summary>
+            /// 現在ボックス配列を呼び出す
+            /// </summary>
+            /// <returns></returns>
             public IBoxArray[,] GetBlockArray() => IsStored ? BoxArrays : throw new NullReferenceException();
 
+            /// <summary>
+            /// 配列を Dfs で探索してグループ化する
+            /// </summary>
+            /// <param name="maxrow"></param>
+            /// <param name="maxcolumn"></param>
+            /// <param name="boxes"></param>
+            /// <returns></returns>
             private List<GroupPosition>[] MatchBoxes(int maxrow, int maxcolumn, IBoxArray[,] boxes)
             {
                 // Bool は宣言時に false になってるため、初期化は不要
@@ -332,10 +384,18 @@ namespace ManeProject.Infrastructure.Repository.Cache
 
             }
 
+            /// <summary>
+            /// チェックできるのか確認 ( 最大行、最大列以内のかを確認 ) 
+            /// </summary>
+            /// <param name="dr"></param>
+            /// <param name="dc"></param>
+            /// <param name="maxRow"></param>
+            /// <param name="maxColumn"></param>
+            /// <returns></returns>
             private static bool canCheck(int dr, int dc, int maxRow, int maxColumn)
                 => (dr >= 0 && dr < maxRow && dc >= 0 && dc < maxColumn);
         }
 
-        private static readonly Lazy<BlockCacheImpl> instance = new Lazy<BlockCacheImpl>(() => new BlockCacheImpl());
+        private static readonly Lazy<BoxArrayCacheImpl> instance = new Lazy<BoxArrayCacheImpl>(() => new BoxArrayCacheImpl());
     }
 }
