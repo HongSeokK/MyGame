@@ -15,15 +15,19 @@ namespace ManeProject.Infrastructure.Repository
 
         private static readonly Lazy<IRepository> instance = new Lazy<IRepository>(() => new BoxRepositoryImpl(BlockCache.Instance));
 
+        /// <summary>
+        /// ボックスレポジトリ
+        /// </summary>
         private sealed class BoxRepositoryImpl : IRepository
         {
+
             private readonly ICache m_cache;
 
             public BoxRepositoryImpl(ICache cache) => m_cache = cache;
 
             public Task<IBoxArray[,]> CreateBoxArray()
             {
-                var dbArray = DBConnect.SQLConnect.Table<DBArray>().ToList();
+                var dbArray = DBManager.SQLConnect.Table<DBArray>().ToList();
 
                 return Task.FromResult(m_cache.InitBoxArray(dbArray));
             }

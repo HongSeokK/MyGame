@@ -36,7 +36,7 @@ namespace ManeProject.Scene.GameMain
         async void InitScene()
         {
 
-            await DBConnect.Initialize();
+            await DBManager.Initialize();
 
             var boxInfo = await BoxRepository.Instance.CreateBoxArray();
 
@@ -237,7 +237,6 @@ namespace ManeProject.Scene.GameMain
                 currentPos.transform.position = Vector3.MoveTowards(currentPos.transform.position, Pos, speed);
                 if (Vector2.Distance(Pos, currentPos.transform.position) == 0)
                 {
-                    Debug.Log("breaked");
                     break;
                 }
                 IsBoxesMoving = true;

@@ -78,7 +78,7 @@ namespace ManeProject.Infrastructure.Repository.Cache
 
                 var createdCount = 0;
 
-                var limitColorCount = (row * column) / 3 + 1;
+                var limitColorCount = (row * column / Common.Common.COLOR_COUNT) + 1;
 
                 DBArray = dbArray;
 
