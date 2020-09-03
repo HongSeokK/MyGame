@@ -18,13 +18,13 @@ namespace ManeProject.Domain.Box
         public static IType Red => red.Value;
 
         /// <summary>
-        /// 黄色
+        /// 黄
         /// </summary>
         public static IType Yellow => yellow.Value;
 
         /// <summary>
         /// タイプ数
-        /// 3 で固定
+        /// 3で固定
         /// </summary>
         public const int BoxTypeCount = 3;
 
