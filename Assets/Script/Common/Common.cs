@@ -17,4 +17,15 @@ namespace ManeProject.Common
 
         public const int BOX_SCORE = 10000;
     }
+
+    public static class SceneCommon
+    {
+        public enum SceneInfo
+        {
+            StartScene,
+            LoadingScene,
+            GameMain,
+            ResultScene,
+        }
+    }
 }
