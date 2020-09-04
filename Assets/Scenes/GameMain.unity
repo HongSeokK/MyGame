@@ -564,7 +564,7 @@ MonoBehaviour:
   Red: {fileID: 3939732259952509031, guid: 7e612c8f5328a4ef0a4c00297caa1939, type: 3}
   Blue: {fileID: 7856781675628646431, guid: 69293d72d97ae4246a2c220190e140ea, type: 3}
   Yellow: {fileID: 8504270950689848658, guid: ba267cd6af7fc47a89d5c9e4393766cc, type: 3}
-  ScoreText: {fileID: 0}
+  ScoreText: {fileID: 1408340711}
 --- !u!1 &1228075406
 GameObject:
   m_ObjectHideFlags: 0
