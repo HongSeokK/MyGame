@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using ManeProject.Domain.Box;
 using ManeProject.Infrastructure.DB;
 using ManeProject.Infrastructure.Repository;
+using ManeProject.Infrastructure.Repository.Cache;
 
 namespace ManeProject.Scene.GameMain
 {
@@ -40,6 +41,8 @@ namespace ManeProject.Scene.GameMain
         {
 
             await DBManager.Initialize();
+
+            DisposeCaches();
 
             var boxInfo = await BoxRepository.Instance.CreateBoxArray();
             var ScoreInfo = ScoreRepository.Instance.CreateScore(Common.Common.GAME_END_SCORE);
@@ -77,6 +80,12 @@ namespace ManeProject.Scene.GameMain
                     }
                 }
             }
+        }
+
+        private void DisposeCaches()
+        {
+            BoxArrayCache.Instance.Dispose();
+            ScoreCache.Instance.Dispose();
         }
 
         // Update is called once per frame
@@ -264,7 +273,7 @@ namespace ManeProject.Scene.GameMain
         {
             var Score = ScoreRepository.Instance.UpdateScore(deletedCount * Common.Common.BOX_SCORE);
 
-            if (Score.m_NowScore >= Score.m_EndGameScore) Debug.Log("EndGame");
+            if (Score.m_NowScore >= Score.m_EndGameScore) SceneChangeController.LoadScene(Common.SceneCommon.SceneInfo.EndScene);
 
             ScoreText.text = Score.m_NowScore.ToString();
         }
