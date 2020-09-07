@@ -291,7 +291,7 @@ namespace ManeProject.Infrastructure.Repository.Cache
             /// </summary>
             public void Dispose()
             {
-                BoxArrays.Initialize();
+                if(IsStored) BoxArrays.Initialize();
                 IsStored = false;
             }
 

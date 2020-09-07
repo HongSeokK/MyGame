@@ -25,7 +25,7 @@ namespace ManeProject.Common
             StartScene,
             LoadingScene,
             GameMain,
-            ResultScene,
+            EndScene,
         }
     }
 }
